@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="My Eats">
+<meta name="theme-color" content="#1a1208">
+<title>My Eats</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --ink: #1a1208;
+    --cream: #f5efe3;
+    --warm: #e8dcc8;
+    --gold: #c8943a;
+    --gold-light: #e8b86d;
+    --rust: #b85c38;
+    --sage: #7a8c6e;
+    --sage-light: #a8bfa0;
+    --paper: #faf6ee;
+    --paper-wish: #f0f5ee;
+    --shadow: rgba(26,18,8,0.12);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--ink);
+    color: var(--ink);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── HEADER ─────────────────────────────────── */
+  header {
+    background: var(--ink);
+    padding: 20px 20px 0;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .header-inner {
+    display: flex; align-items: center; justify-content: space-between;
+    padding-bottom: 14px;
+  }
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px; font-weight: 700;
+    color: var(--gold-light); letter-spacing: -0.5px;
+  }
+  .logo span { color: var(--cream); font-style: italic; }
+  .add-btn {
+    background: var(--gold); color: var(--ink);
+    border: none; border-radius: 50px; padding: 10px 18px;
+    font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 14px;
+    cursor: pointer; transition: background 0.2s, transform 0.1s;
+  }
+  .add-btn:active { transform: scale(0.96); background: var(--gold-light); }
+
+  /* ── TABS ────────────────────────────────────── */
+  .tabs {
+    display: flex; gap: 4px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 12px; padding: 4px;
+    margin-bottom: 2px;
+  }
+  .tab {
+    flex: 1; text-align: center; padding: 9px 8px; border-radius: 9px;
+    font-size: 13px; font-weight: 500; cursor: pointer;
+    color: rgba(245,239,227,0.45); border: none; background: none;
+    font-family: 'DM Sans', sans-serif;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    transition: all 0.2s;
+  }
+  .tab.active-visited  { background: var(--gold); color: var(--ink); }
+  .tab.active-wishlist { background: var(--sage); color: white; }
+  .tab.active-guide    { background: var(--cream); color: var(--ink); }
+  .tab-count {
+    background: rgba(26,18,8,0.15); border-radius: 50px;
+    padding: 1px 7px; font-size: 11px; font-weight: 600;
+  }
+  .tab:not(.active-visited):not(.active-wishlist) .tab-count {
+    background: rgba(255,255,255,0.1); color: rgba(245,239,227,0.5);
+  }
+
+  /* ── CONTROLS ────────────────────────────────── */
+  .controls {
+    padding: 10px 0 12px; display: flex; gap: 10px; align-items: center;
+  }
+  .search-wrap { flex: 1; position: relative; }
+  .search-wrap input {
+    width: 100%; background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(200,148,58,0.2); border-radius: 8px;
+    padding: 9px 12px 9px 36px; color: var(--cream);
+    font-family: 'DM Sans', sans-serif; font-size: 14px; outline: none;
+    transition: border 0.2s;
+  }
+  .search-wrap input::placeholder { color: rgba(245,239,227,0.35); }
+  .search-wrap input:focus { border-color: var(--gold); }
+  .search-icon {
+    position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+    color: rgba(200,148,58,0.5); font-size: 15px; pointer-events: none;
+  }
+  .filter-btn {
+    background: rgba(255,255,255,0.07); border: 1px solid rgba(200,148,58,0.2);
+    border-radius: 8px; padding: 9px 13px; color: var(--gold-light);
+    font-size: 16px; cursor: pointer; transition: background 0.2s;
+  }
+  .filter-btn.active { background: var(--gold); color: var(--ink); border-color: var(--gold); }
+
+  .tag-strip {
+    padding: 0 0 14px; display: flex; gap: 7px; overflow-x: auto; scrollbar-width: none;
+  }
+  .tag-strip::-webkit-scrollbar { display: none; }
+  .tag-pill {
+    background: rgba(255,255,255,0.06); border: 1px solid rgba(200,148,58,0.18);
+    border-radius: 50px; padding: 5px 13px; color: rgba(245,239,227,0.65);
+    font-size: 12px; white-space: nowrap; cursor: pointer;
+    transition: all 0.15s; font-family: 'DM Sans', sans-serif;
+  }
+  .tag-pill.av { background: var(--gold); color: var(--ink); border-color: var(--gold); font-weight: 500; }
+  .tag-pill.aw { background: var(--sage); color: white; border-color: var(--sage); font-weight: 500; }
+
+  /* ── MAIN ────────────────────────────────────── */
+  main {
+    background: var(--paper); min-height: calc(100vh - 160px);
+    border-radius: 20px 20px 0 0; padding: 20px 16px 100px;
+  }
+  main.wish { background: var(--paper-wish); }
+  main.guide { background: #fffdf8; }
+
+  /* ── CITY GUIDE ──────────────────────────────── */
+  .guide-intro {
+    text-align: center; padding: 18px 8px 22px;
+    border-bottom: 1px dashed rgba(26,18,8,0.1); margin-bottom: 24px;
+  }
+  .guide-intro p { font-size: 12px; color: rgba(26,18,8,0.38); letter-spacing: 0.5px; }
+
+  .city-block { margin-bottom: 28px; }
+  .city-heading {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px; font-weight: 700; color: var(--ink);
+    border-bottom: 2px solid var(--gold);
+    padding-bottom: 6px; margin-bottom: 14px;
+    display: flex; align-items: baseline; justify-content: space-between;
+  }
+  .city-heading .city-count {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px; font-weight: 500; color: rgba(26,18,8,0.35);
+    letter-spacing: 1px; text-transform: uppercase;
+  }
+
+  .guide-section-label {
+    font-size: 10px; font-weight: 600; letter-spacing: 1.8px;
+    text-transform: uppercase; margin: 14px 0 8px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .guide-section-label.lv { color: var(--gold); }
+  .guide-section-label.lw { color: var(--sage); }
+  .guide-section-label::after {
+    content: ''; flex: 1; height: 1px; background: currentColor; opacity: 0.25;
+  }
+
+  .guide-row {
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(26,18,8,0.06);
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .guide-row:last-child { border-bottom: none; }
+  .guide-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px; font-weight: 700; color: var(--ink);
+  }
+  .guide-neighbourhood {
+    font-size: 12px; color: rgba(26,18,8,0.4);
+  }
+  .guide-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 3px; }
+  .guide-tag {
+    background: var(--warm); color: rgba(26,18,8,0.6);
+    border-radius: 50px; padding: 2px 8px; font-size: 11px; font-weight: 500;
+  }
+  .guide-tag.gt { background: rgba(200,148,58,0.15); color: var(--gold); }
+  .guide-tag.gw { background: rgba(122,140,110,0.15); color: var(--sage); }
+
+  .controls.hidden { display: none; }
+  .tag-strip.hidden { display: none; }
+
+  .section-label {
+    font-size: 11px; font-weight: 500; letter-spacing: 1.5px;
+    text-transform: uppercase; color: rgba(26,18,8,0.35); margin: 4px 4px 14px;
+  }
+  .empty-state {
+    text-align: center; padding: 60px 20px; color: rgba(26,18,8,0.35);
+  }
+  .empty-state .ei { font-size: 48px; margin-bottom: 12px; }
+  .empty-state p { font-family: 'Playfair Display', serif; font-size: 18px; font-style: italic; }
+  .empty-state small { font-size: 13px; margin-top: 6px; display: block; }
+
+  /* ── CARD ────────────────────────────────────── */
+  .card {
+    background: white; border-radius: 14px; padding: 16px; margin-bottom: 10px;
+    box-shadow: 0 2px 8px var(--shadow);
+    display: flex; gap: 12px; align-items: flex-start;
+    border: 1px solid rgba(26,18,8,0.06);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .card.wc { background: #fafffe; border-color: rgba(122,140,110,0.15); }
+  .card.dragging { opacity: 0.5; transform: scale(0.97); }
+  .card.drag-over { border: 2px dashed var(--gold); transform: translateY(-2px); box-shadow: 0 6px 20px var(--shadow); }
+  .card.wc.drag-over { border-color: var(--sage); }
+
+  .card-rank {
+    font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700;
+    color: var(--gold); min-width: 30px; text-align: center; line-height: 1; padding-top: 2px;
+  }
+  .card-rank.wr { color: var(--sage); font-size: 18px; }
+
+  .card-body { flex: 1; min-width: 0; }
+  .card-name {
+    font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 700;
+    color: var(--ink); line-height: 1.2;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .card-meta { font-size: 12px; color: rgba(26,18,8,0.45); margin-top: 3px; display: flex; align-items: center; gap: 5px; }
+  .dot { width: 3px; height: 3px; border-radius: 50%; background: currentColor; display: inline-block; }
+  .card-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 9px; }
+  .card-tag { background: var(--warm); color: rgba(26,18,8,0.65); border-radius: 50px; padding: 3px 9px; font-size: 11px; font-weight: 500; }
+  .card-tag.pv { background: var(--gold); color: var(--ink); }
+  .card-tag.pw { background: var(--sage); color: white; }
+  .card-note { font-size: 13px; color: rgba(26,18,8,0.5); margin-top: 8px; font-style: italic; line-height: 1.4; }
+
+  .card-actions { display: flex; flex-direction: column; gap: 5px; align-items: flex-end; flex-shrink: 0; }
+  .icon-btn { background: none; border: none; cursor: pointer; color: rgba(26,18,8,0.28); font-size: 16px; padding: 3px; transition: color 0.15s; line-height: 1; }
+  .icon-btn:hover { color: var(--rust); }
+  .visited-btn {
+    background: var(--sage); color: white; border: none; border-radius: 50px;
+    padding: 4px 10px; font-size: 11px; font-weight: 500; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; white-space: nowrap; transition: background 0.15s;
+  }
+  .visited-btn:active { background: #5a7a52; }
+  .drag-handle { color: rgba(26,18,8,0.2); font-size: 16px; cursor: grab; padding: 4px; line-height: 1; }
+
+  /* ── REORDER BANNER ─────────────────────────── */
+  .reorder-banner {
+    display: none; border-radius: 10px; margin-bottom: 12px;
+    background: var(--gold); color: var(--ink);
+    text-align: center; padding: 10px; font-size: 13px; font-weight: 500;
+  }
+  .reorder-banner.wbanner { background: var(--sage); color: white; }
+  .reorder-banner.show { display: block; }
+
+  /* ── DELETE CONFIRM ─────────────────────────── */
+  .del-overlay {
+    display: none; position: fixed; inset: 0; z-index: 300;
+    background: rgba(26,18,8,0.75); backdrop-filter: blur(4px);
+    align-items: flex-end; justify-content: center;
+  }
+  .del-overlay.open { display: flex; animation: fadeIn 0.2s; }
+  .del-sheet {
+    background: var(--paper); border-radius: 22px 22px 0 0;
+    width: 100%; max-width: 600px; padding: 28px 20px 44px;
+    animation: slideUp 0.25s cubic-bezier(0.34,1.2,0.64,1);
+    text-align: center;
+  }
+  .del-sheet h3 { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--ink); margin-bottom: 8px; }
+  .del-sheet p { font-size: 14px; color: rgba(26,18,8,0.5); margin-bottom: 24px; }
+  .del-actions { display: flex; gap: 10px; }
+  .btn-del-confirm { flex: 1; background: var(--rust); color: white; border: none; border-radius: 12px; padding: 15px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 500; cursor: pointer; }
+  .btn-del-cancel { flex: 1; background: rgba(26,18,8,0.07); color: rgba(26,18,8,0.6); border: none; border-radius: 12px; padding: 15px; font-family: 'DM Sans', sans-serif; font-size: 15px; cursor: pointer; }
+
+  /* ── MODAL ───────────────────────────────────── */
+  .overlay {
+    display: none; position: fixed; inset: 0; z-index: 200;
+    background: rgba(26,18,8,0.75); backdrop-filter: blur(4px);
+    align-items: flex-end; justify-content: center;
+  }
+  .overlay.open { display: flex; animation: fadeIn 0.2s; }
+  @keyframes fadeIn { from { opacity: 0; } }
+
+  .modal {
+    background: var(--paper); border-radius: 22px 22px 0 0;
+    width: 100%; max-width: 600px; max-height: 92vh; overflow-y: auto;
+    padding: 24px 20px 40px;
+    animation: slideUp 0.28s cubic-bezier(0.34,1.4,0.64,1);
+  }
+  @keyframes slideUp { from { transform: translateY(100%); } }
+
+  .modal-handle { width: 40px; height: 4px; border-radius: 2px; background: rgba(26,18,8,0.15); margin: 0 auto 20px; }
+  .modal-title { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: var(--ink); margin-bottom: 18px; }
+
+  .status-toggle { display: flex; gap: 8px; margin-bottom: 18px; }
+  .sopt {
+    flex: 1; padding: 10px 8px; border-radius: 10px;
+    border: 2px solid rgba(26,18,8,0.1); text-align: center;
+    cursor: pointer; font-size: 13px; font-weight: 500;
+    font-family: 'DM Sans', sans-serif; color: rgba(26,18,8,0.45);
+    transition: all 0.15s;
+  }
+  .sopt.sv { background: var(--gold); color: var(--ink); border-color: var(--gold); }
+  .sopt.sw { background: var(--sage); color: white; border-color: var(--sage); }
+
+  .field { margin-bottom: 16px; }
+  .field label { display: block; font-size: 12px; font-weight: 500; letter-spacing: 0.8px; text-transform: uppercase; color: rgba(26,18,8,0.45); margin-bottom: 6px; }
+  .field input, .field textarea {
+    width: 100%; background: white; border: 1.5px solid rgba(26,18,8,0.12);
+    border-radius: 10px; padding: 11px 13px;
+    font-family: 'DM Sans', sans-serif; font-size: 15px; color: var(--ink);
+    outline: none; transition: border 0.2s; -webkit-appearance: none;
+  }
+  .field input:focus, .field textarea:focus { border-color: var(--gold); }
+  .field textarea { resize: none; height: 80px; }
+  .field-row { display: flex; gap: 10px; }
+  .field-row .field { flex: 1; }
+
+  .tag-picker { display: flex; flex-wrap: wrap; gap: 7px; }
+  .topt {
+    background: rgba(26,18,8,0.05); border: 1.5px solid rgba(26,18,8,0.1);
+    border-radius: 50px; padding: 6px 13px; font-size: 13px; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; color: rgba(26,18,8,0.65);
+    user-select: none; transition: all 0.15s;
+  }
+  .topt.tsv { background: var(--gold); color: var(--ink); border-color: var(--gold); font-weight: 500; }
+  .topt.tsw { background: var(--sage); color: white; border-color: var(--sage); font-weight: 500; }
+
+  .modal-actions { display: flex; gap: 10px; margin-top: 24px; }
+  .btn-save {
+    flex: 1; background: var(--ink); color: var(--gold-light);
+    border: none; border-radius: 12px; padding: 15px;
+    font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 700;
+    cursor: pointer; transition: background 0.2s;
+  }
+  .btn-save.bsw { color: var(--sage-light); }
+  .btn-save:active { background: #2d2015; }
+  .btn-cancel {
+    background: rgba(26,18,8,0.07); color: rgba(26,18,8,0.55);
+    border: none; border-radius: 12px; padding: 15px 20px;
+    font-family: 'DM Sans', sans-serif; font-size: 15px; cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">my <span>eats</span></div>
+    <button class="add-btn" onclick="openModal()">＋ Add Place</button>
+  </div>
+  <div class="tabs">
+    <button class="tab" id="tab-visited" onclick="switchTab('visited')">
+      🍴 Been There <span class="tab-count" id="cnt-v">0</span>
+    </button>
+    <button class="tab" id="tab-wishlist" onclick="switchTab('wishlist')">
+      ✨ Wishlist <span class="tab-count" id="cnt-w">0</span>
+    </button>
+    <button class="tab" id="tab-guide" onclick="switchTab('guide')">
+      🗺️ City Guide
+    </button>
+  </div>
+  <div class="controls" id="controlsBar">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="searchInput" placeholder="Search places, cities…" oninput="renderList()">
+    </div>
+    <button class="filter-btn" id="reorderBtn" onclick="toggleReorder()" title="Reorder">⇅</button>
+  </div>
+  <div class="tag-strip" id="tagStrip"></div>
+</header>
+
+<main id="mainArea">
+  <div class="reorder-banner" id="reorderBanner"></div>
+  <div class="section-label" id="sectionLabel"></div>
+  <div id="listContainer"></div>
+</main>
+
+<!-- DELETE CONFIRM -->
+<div class="del-overlay" id="delOverlay" onclick="maybeCloseDelOverlay(event)">
+  <div class="del-sheet">
+    <h3>Remove this place?</h3>
+    <p id="delName"></p>
+    <div class="del-actions">
+      <button class="btn-del-cancel" onclick="closeDelConfirm()">Keep it</button>
+      <button class="btn-del-confirm" onclick="confirmDelete()">Yes, remove</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="overlay" id="overlay" onclick="maybeClose(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="modalTitle">New Place</div>
+    <div class="status-toggle">
+      <div class="sopt" id="sopt-v" onclick="setStatus('visited')">🍴 Been There</div>
+      <div class="sopt" id="sopt-w" onclick="setStatus('wishlist')">✨ Want to Go</div>
+    </div>
+    <div class="field">
+      <label>Restaurant Name *</label>
+      <input type="text" id="fName" placeholder="e.g. The Salty Pig">
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>City *</label>
+        <input type="text" id="fCity" placeholder="e.g. Boston">
+      </div>
+      <div class="field">
+        <label>Neighbourhood</label>
+        <input type="text" id="fNeighbour" placeholder="e.g. South End">
+      </div>
+    </div>
+    <div class="field">
+      <label>Tags — pick all that apply</label>
+      <div class="tag-picker" id="tagPicker"></div>
+    </div>
+    <div class="field">
+      <label>Notes (optional)</label>
+      <textarea id="fNote" placeholder="What made it special? Or why you want to try it…"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-save" id="btnSave" onclick="saveEntry()">Save Place ✦</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const TAGS = ['Brunch','Breakfast','Lunch','Dinner','Seafood','Vibey','Cocktails','Pub','Healthy','Pasta','Affordable','Fancy','Patio','Rooftop','Cozy','Ethnic','Asian','Mexican','Italian','French','Latin','Pizza','Burgers','Sushi','Vegetarian','Late Night','Date Night','Classic','Family Friendly','Hidden Gem','Not Good','Group','Walk-In Only','Uber'];
+
+// Load & migrate from v2
+let places = JSON.parse(localStorage.getItem('myeats_v3') || 'null');
+if (!places) {
+  const old = localStorage.getItem('myeats_v2');
+  places = old ? JSON.parse(old).map(p=>({...p, status:'visited'})) : [];
+  save();
+}
+
+let editId = null, activeTab = 'visited', tagFilter = null, reorderMode = false, mStatus = 'visited';
+let dragSrc = null;
+
+function save() { localStorage.setItem('myeats_v3', JSON.stringify(places)); }
+
+// ── TABS ──────────────────────────────────────────────────────
+function switchTab(t) {
+  activeTab = t; tagFilter = null; reorderMode = false;
+  document.getElementById('reorderBtn').classList.remove('active');
+  const isGuide = t === 'guide';
+  document.getElementById('controlsBar').className = 'controls' + (isGuide ? ' hidden' : '');
+  document.getElementById('tagStrip').className = 'tag-strip' + (isGuide ? ' hidden' : '');
+  if (isGuide) renderGuide(); else renderList();
+}
+
+function updateTabs() {
+  document.getElementById('cnt-v').textContent = places.filter(p=>p.status==='visited').length;
+  document.getElementById('cnt-w').textContent = places.filter(p=>p.status==='wishlist').length;
+  document.getElementById('tab-visited').className  = 'tab' + (activeTab==='visited'  ? ' active-visited'  : '');
+  document.getElementById('tab-wishlist').className = 'tab' + (activeTab==='wishlist' ? ' active-wishlist' : '');
+  document.getElementById('tab-guide').className    = 'tab' + (activeTab==='guide'    ? ' active-guide'    : '');
+}
+
+// ── TAG STRIP ─────────────────────────────────────────────────
+function renderTagStrip() {
+  const used = [...new Set(places.filter(p=>p.status===activeTab).flatMap(p=>p.tags))].sort();
+  document.getElementById('tagStrip').innerHTML = ['All',...used].map(t=>{
+    const on = tagFilter===t;
+    const cls = on ? (activeTab==='visited'?'av':'aw') : '';
+    return `<div class="tag-pill ${cls}" onclick="filterTag('${t}')">${t}</div>`;
+  }).join('');
+}
+
+function filterTag(t) { tagFilter=(t==='All'||tagFilter===t)?null:t; renderList(); }
+
+// ── MAIN RENDER ───────────────────────────────────────────────
+function renderList() {
+  if (activeTab === 'guide') { renderGuide(); return; }
+  updateTabs();
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  const isW = activeTab==='wishlist';
+  const pool = places.filter(p=>p.status===activeTab);
+  const filtered = pool.filter(p=>{
+    const mq = !q || [p.name,p.city,p.neighbourhood||'',...p.tags].some(s=>s.toLowerCase().includes(q));
+    const mt = !tagFilter || p.tags.includes(tagFilter);
+    return mq && mt;
+  });
+
+  document.getElementById('mainArea').className = isW ? 'wish' : '';
+  const banner = document.getElementById('reorderBanner');
+  banner.className = 'reorder-banner' + (isW?' wbanner':'') + (reorderMode?' show':'');
+  banner.textContent = isW ? '✦ Drag cards to reorder your wishlist' : '✦ Drag cards to reorder your favourites';
+  document.getElementById('sectionLabel').textContent = filtered.length ? `${filtered.length} place${filtered.length!==1?'s':''}` : '';
+
+  const c = document.getElementById('listContainer');
+  if (!filtered.length) {
+    c.innerHTML = `<div class="empty-state"><div class="ei">${isW?'✨':'🍽️'}</div>
+      <p>${isW?"Your wishlist is empty":"No places yet"}</p>
+      <small>${isW?"Add spots you're dying to try":"Tap \"+ Add Place\" to log your first meal"}</small></div>`;
+    renderTagStrip(); return;
+  }
+
+  c.innerHTML = filtered.map(p=>{
+    const rank = pool.indexOf(p)+1;
+    const [pt,...rt] = p.tags;
+    return `<div class="card${isW?' wc':''}" id="card-${p.id}"
+      draggable="${reorderMode}"
+      ondragstart="dStart(event,'${p.id}')" ondragover="dOver(event,'${p.id}')"
+      ondrop="dDrop(event,'${p.id}')" ondragend="dEnd()"
+      ontouchstart="tStart(event,'${p.id}')" ontouchmove="tMove(event)" ontouchend="tEnd(event,'${p.id}')">
+      <div class="card-rank${isW?' wr':''}">${isW?'★':rank}</div>
+      <div class="card-body">
+        <div class="card-name">${x(p.name)}</div>
+        <div class="card-meta">📍 ${x(p.city)}${p.neighbourhood?`<span class="dot"></span>${x(p.neighbourhood)}`:''}</div>
+        <div class="card-tags">
+          ${pt?`<span class="card-tag ${isW?'pw':'pv'}">${pt}</span>`:''}
+          ${rt.map(t=>`<span class="card-tag">${t}</span>`).join('')}
+        </div>
+        ${p.note?`<div class="card-note">"${x(p.note)}"</div>`:''}
+      </div>
+      <div class="card-actions">
+        ${isW?`<button class="visited-btn" onclick="markVisited('${p.id}')">✓ Been!</button>`:''}
+        <button class="icon-btn" onclick="editEntry('${p.id}')">✏️</button>
+        <button class="icon-btn" onclick="delEntry('${p.id}')">🗑️</button>
+        <div class="drag-handle">⠿</div>
+      </div>
+    </div>`;
+  }).join('');
+  renderTagStrip();
+}
+
+function x(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ── CITY GUIDE RENDER ─────────────────────────────────────────
+function renderGuide() {
+  updateTabs();
+  document.getElementById('mainArea').className = 'guide';
+  document.getElementById('reorderBanner').className = 'reorder-banner';
+  document.getElementById('sectionLabel').textContent = '';
+
+  const c = document.getElementById('listContainer');
+
+  if (!places.length) {
+    c.innerHTML = `<div class="empty-state"><div class="ei">🗺️</div>
+      <p>No places yet</p><small>Add some restaurants to see your city guide</small></div>`;
+    return;
+  }
+
+  // group all places by city
+  const cityMap = {};
+  places.forEach(p => {
+    const city = p.city.trim();
+    if (!cityMap[city]) cityMap[city] = { visited: [], wishlist: [] };
+    cityMap[city][p.status].push(p);
+  });
+
+  const cities = Object.keys(cityMap).sort();
+
+  c.innerHTML = `
+    <div class="guide-intro">
+      <p>📸 Screenshot this to share your recommendations</p>
+    </div>
+    ${cities.map(city => {
+      const v = cityMap[city].visited;
+      const w = cityMap[city].wishlist;
+      const total = v.length + w.length;
+
+      const makeRow = (p, type) => `
+        <div class="guide-row">
+          <div class="guide-name">${x(p.name)}</div>
+          ${p.neighbourhood ? `<div class="guide-neighbourhood">📍 ${x(p.neighbourhood)}</div>` : ''}
+          ${p.tags.length ? `<div class="guide-tags">
+            ${p.tags.map((t,i) => `<span class="guide-tag ${i===0?(type==='v'?'gt':'gw'):''}">${t}</span>`).join('')}
+          </div>` : ''}
+        </div>`;
+
+      return `<div class="city-block">
+        <div class="city-heading">
+          ${x(city)}
+          <span class="city-count">${total} place${total!==1?'s':''}</span>
+        </div>
+        ${v.length ? `
+          <div class="guide-section-label lv">🍴 Been There</div>
+          ${v.map(p => makeRow(p,'v')).join('')}
+        ` : ''}
+        ${w.length ? `
+          <div class="guide-section-label lw">✨ Wishlist</div>
+          ${w.map(p => makeRow(p,'w')).join('')}
+        ` : ''}
+      </div>`;
+    }).join('')}
+  `;
+}
+
+
+function setStatus(s) {
+  mStatus = s;
+  document.getElementById('sopt-v').className = 'sopt'+(s==='visited'?' sv':'');
+  document.getElementById('sopt-w').className = 'sopt'+(s==='wishlist'?' sw':'');
+  document.getElementById('btnSave').className = 'btn-save'+(s==='wishlist'?' bsw':'');
+  document.querySelectorAll('.topt').forEach(el=>{
+    if (el.dataset.sel==='1') el.className='topt ts'+s[0];
+  });
+}
+
+function buildTags(sel=[]) {
+  document.getElementById('tagPicker').innerHTML = TAGS.map(t=>{
+    const on = sel.includes(t);
+    return `<div class="topt${on?' ts'+mStatus[0]:''}" data-sel="${on?'1':'0'}" onclick="toggleT(this)">${t}</div>`;
+  }).join('');
+}
+
+function toggleT(el) {
+  const on = el.dataset.sel==='1';
+  el.dataset.sel = on?'0':'1';
+  el.className = 'topt'+(on?'':' ts'+mStatus[0]);
+}
+
+function selTags() { return [...document.querySelectorAll('.topt[data-sel="1"]')].map(e=>e.textContent); }
+
+function openModal(entry=null) {
+  editId = entry?entry.id:null;
+  mStatus = entry?entry.status:activeTab;
+  document.getElementById('modalTitle').textContent = entry?'Edit Place':'New Place';
+  document.getElementById('fName').value = entry?entry.name:'';
+  document.getElementById('fCity').value = entry?entry.city:'';
+  document.getElementById('fNeighbour').value = entry?(entry.neighbourhood||''):'';
+  document.getElementById('fNote').value = entry?(entry.note||''):'';
+  setStatus(mStatus);
+  buildTags(entry?entry.tags:[]);
+  document.getElementById('overlay').classList.add('open');
+  setTimeout(()=>document.getElementById('fName').focus(),300);
+}
+
+function closeModal() { document.getElementById('overlay').classList.remove('open'); editId=null; }
+function maybeClose(e) { if(e.target===document.getElementById('overlay')) closeModal(); }
+
+function saveEntry() {
+  const name=document.getElementById('fName').value.trim();
+  const city=document.getElementById('fCity').value.trim();
+  if (!name||!city){ alert('Please enter a name and city.'); return; }
+  const entry = {
+    id: editId||Date.now().toString(), name, city,
+    neighbourhood: document.getElementById('fNeighbour').value.trim(),
+    tags: selTags(),
+    note: document.getElementById('fNote').value.trim(),
+    status: mStatus,
+    added: editId?(places.find(p=>p.id===editId)||{}).added:Date.now()
+  };
+  if (editId) { const i=places.findIndex(p=>p.id===editId); places[i]=entry; }
+  else places.push(entry);
+  save(); closeModal(); activeTab=entry.status; renderList();
+}
+
+function editEntry(id) { openModal(places.find(p=>p.id===id)); }
+
+let pendingDeleteId = null;
+function delEntry(id) {
+  const p = places.find(p=>p.id===id);
+  if (!p) return;
+  pendingDeleteId = id;
+  document.getElementById('delName').textContent = p.name;
+  document.getElementById('delOverlay').classList.add('open');
+}
+function confirmDelete() {
+  places = places.filter(p=>p.id!==pendingDeleteId);
+  pendingDeleteId = null;
+  save(); closeDelConfirm(); renderList();
+}
+function closeDelConfirm() {
+  document.getElementById('delOverlay').classList.remove('open');
+  pendingDeleteId = null;
+}
+function maybeCloseDelOverlay(e) {
+  if (e.target===document.getElementById('delOverlay')) closeDelConfirm();
+}
+function markVisited(id) { const p=places.find(p=>p.id===id); if(p){p.status='visited';} save(); activeTab='visited'; renderList(); }
+
+// ── REORDER ───────────────────────────────────────────────────
+function toggleReorder() {
+  reorderMode=!reorderMode;
+  document.getElementById('reorderBtn').classList.toggle('active',reorderMode);
+  renderList();
+}
+
+function move(srcId,tgtId) {
+  const fi=places.findIndex(p=>p.id===srcId), ti=places.findIndex(p=>p.id===tgtId);
+  const [m]=places.splice(fi,1); places.splice(ti,0,m); save(); renderList();
+}
+
+// Desktop DnD
+function dStart(e,id){ if(!reorderMode){e.preventDefault();return;} dragSrc=id; e.dataTransfer.effectAllowed='move'; document.getElementById('card-'+id).classList.add('dragging'); }
+function dOver(e,id){ if(!reorderMode||dragSrc===id)return; e.preventDefault(); document.querySelectorAll('.card').forEach(c=>c.classList.remove('drag-over')); document.getElementById('card-'+id)?.classList.add('drag-over'); }
+function dDrop(e,id){ if(!reorderMode||dragSrc===id)return; e.preventDefault(); move(dragSrc,id); }
+function dEnd(){ document.querySelectorAll('.card').forEach(c=>c.classList.remove('dragging','drag-over')); }
+
+// Touch DnD
+let tEl=null,tId=null,tClone=null,tOff=0;
+function tStart(e,id){ if(!reorderMode)return; tId=id; tEl=document.getElementById('card-'+id); const r=tEl.getBoundingClientRect(); tOff=e.touches[0].clientY-r.top; tClone=tEl.cloneNode(true); tClone.style.cssText=`position:fixed;left:${r.left}px;top:${r.top}px;width:${r.width}px;opacity:0.85;z-index:999;pointer-events:none;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,0.3);`; document.body.appendChild(tClone); tEl.style.opacity='0.3'; }
+function tMove(e){ if(!tClone)return; e.preventDefault(); tClone.style.top=(e.touches[0].clientY-tOff)+'px'; tClone.style.display='none'; const u=document.elementFromPoint(e.touches[0].clientX,e.touches[0].clientY); tClone.style.display=''; const c=u?.closest('.card'); document.querySelectorAll('.card').forEach(c=>c.classList.remove('drag-over')); if(c&&c.id!=='card-'+tId)c.classList.add('drag-over'); }
+function tEnd(e,id){ if(!tClone)return; tClone.remove();tClone=null; tEl.style.opacity=''; const oc=document.querySelector('.card.drag-over'); document.querySelectorAll('.card').forEach(c=>c.classList.remove('drag-over')); if(oc)move(tId,oc.id.replace('card-','')); else renderList(); }
+
+// ── INIT ──────────────────────────────────────────────────────
+renderList();
+</script>
+</body>
+</html>
